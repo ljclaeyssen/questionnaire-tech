@@ -1,43 +1,52 @@
-import type {ReactNode} from 'react';
-import clsx from 'clsx';
+import React from 'react';
 import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import HomepageFeatures from '@site/src/components/HomepageFeatures';
-import Heading from '@theme/Heading';
-
 import styles from './index.module.css';
 
-function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
-  return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
-        <Heading as="h1" className="hero__title">
-          {siteConfig.title}
-        </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/intro">
-            Docusaurus Tutorial - 5min ⏱️
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
-}
-
-export default function Home(): ReactNode {
-  const {siteConfig} = useDocusaurusContext();
+export default function Home() {
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
-      <HomepageHeader />
-      <main>
-        <HomepageFeatures />
+      title="Questionnaire Tech Angular"
+      description="Cheat sheet et questions d'entretien pour Angular 16-21">
+      <main className={styles.main}>
+        <div className={styles.hero}>
+          <h1 className={styles.title}>Questionnaire Tech Angular</h1>
+          <p className={styles.subtitle}>Cheat sheet et questions d'entretien pour Angular 16-21</p>
+        </div>
+
+        <div className={styles.sections}>
+          <Link to="/questions/intro" className={styles.card}>
+            <h2>📚 Questions</h2>
+            <p>Questions par niveau : Junior, Confirmé, Senior</p>
+            <ul>
+              <li>Angular CLI & Composants</li>
+              <li>RxJS & Signals</li>
+              <li>Nouveautés Angular 16-21</li>
+            </ul>
+          </Link>
+
+          <Link to="/code-review/intro" className={styles.card}>
+            <h2>🔍 Code Review</h2>
+            <p>Exercices de revue de code</p>
+            <ul>
+              <li>Détection de bugs</li>
+              <li>Optimisation de performance</li>
+              <li>Sécurité & mauvaises pratiques</li>
+            </ul>
+            <span className={styles.badge}>À venir</span>
+          </Link>
+
+          <Link to="/cas-pratiques/intro" className={styles.card}>
+            <h2>⚡ Cas Pratiques</h2>
+            <p>Exercices de code pratiques</p>
+            <ul>
+              <li>Créer des composants</li>
+              <li>Implémenter des services</li>
+              <li>Migrations & formulaires</li>
+            </ul>
+            <span className={styles.badge}>À venir</span>
+          </Link>
+        </div>
       </main>
     </Layout>
   );

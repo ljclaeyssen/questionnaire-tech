@@ -6,7 +6,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'Questionnaire Tech Angular',
-  tagline: 'Ouais hein',
+  tagline: 'Questions d\'entretien technique Angular - Junior, Confirmé, Senior',
   favicon: 'img/favicon.ico',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -15,15 +15,15 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: 'https://your-docusaurus-site.example.com',
+  url: 'https://ljclaeyssen.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: '/questionnaire-tech/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'ljclaeyssen', // Usually your GitHub org/user name.
+  projectName: 'questionnaire-tech', // Usually your repo name.
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -41,27 +41,13 @@ const config: Config = {
       'classic',
       {
         docs: {
+          routeBasePath: 'questions',
           sidebarPath: './sidebars.ts',
-          // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/ljclaeyssen/questionnaire-tech/tree/master/',
         },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-          // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
-        },
+        blog: false, // Désactivé car on se concentre sur la documentation
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -69,13 +55,36 @@ const config: Config = {
     ],
   ],
 
+  plugins: [
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'code-review',
+        path: 'code-review',
+        routeBasePath: 'code-review',
+        sidebarPath: './sidebars.ts',
+        editUrl: 'https://github.com/ljclaeyssen/questionnaire-tech/tree/master/',
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'cas-pratiques',
+        path: 'cas-pratiques',
+        routeBasePath: 'cas-pratiques',
+        sidebarPath: './sidebars.ts',
+        editUrl: 'https://github.com/ljclaeyssen/questionnaire-tech/tree/master/',
+      },
+    ],
+  ],
+
   themeConfig: {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
-      title: 'My Site',
+      title: 'Questionnaire Tech Angular',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'Angular Logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -83,11 +92,20 @@ const config: Config = {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Questions',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/facebook/docusaurus',
+          to: '/code-review/intro',
+          label: 'Code Review',
+          position: 'left',
+        },
+        {
+          to: '/cas-pratiques/intro',
+          label: 'Cas Pratiques',
+          position: 'left',
+        },
+        {
+          href: 'https://github.com/ljclaeyssen/questionnaire-tech',
           label: 'GitHub',
           position: 'right',
         },
@@ -97,50 +115,64 @@ const config: Config = {
       style: 'dark',
       links: [
         {
-          title: 'Docs',
+          title: 'Questions',
           items: [
             {
-              label: 'Tutorial',
-              to: '/docs/intro',
+              label: 'Junior',
+              to: '/questions/category/junior',
+            },
+            {
+              label: 'Confirmé',
+              to: '/questions/category/confirmé',
+            },
+            {
+              label: 'Senior',
+              to: '/questions/category/senior',
             },
           ],
         },
         {
-          title: 'Community',
+          title: 'Pratique',
           items: [
+            {
+              label: 'Code Review',
+              to: '/code-review/intro',
+            },
+            {
+              label: 'Cas Pratiques',
+              to: '/cas-pratiques/intro',
+            },
+          ],
+        },
+        {
+          title: 'Ressources',
+          items: [
+            {
+              label: 'Documentation Angular',
+              href: 'https://angular.dev',
+            },
             {
               label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-            },
-            {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
-              label: 'X',
-              href: 'https://x.com/docusaurus',
+              href: 'https://stackoverflow.com/questions/tagged/angular',
             },
           ],
         },
         {
-          title: 'More',
+          title: 'Plus',
           items: [
             {
-              label: 'Blog',
-              to: '/blog',
-            },
-            {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/ljclaeyssen/questionnaire-tech',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Questionnaire Tech Angular. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
+      additionalLanguages: ['typescript', 'bash', 'json', 'scss'],
     },
   } satisfies Preset.ThemeConfig,
 };

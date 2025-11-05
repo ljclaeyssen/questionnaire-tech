@@ -18,3 +18,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+/.claude
+
+#juste parce que Claude troll à créer ça sur windows...
+nul
