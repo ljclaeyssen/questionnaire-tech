@@ -15,6 +15,4 @@ Créer un système de vote pour déterminer le meilleur animal du zoo !
 **Features :**
 - Page VS pour faire s'affronter 2 animaux aléatoires
 - Page Leaderboard avec classement par score
-- Gestion d'état avec Signals
-- Persistence avec localStorage
 

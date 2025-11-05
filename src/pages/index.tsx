@@ -33,7 +33,6 @@ export default function Home() {
               <li>Optimisation de performance</li>
               <li>Sécurité & mauvaises pratiques</li>
             </ul>
-            <span className={styles.badge}>À venir</span>
           </Link>
 
           <Link to="/cas-pratiques/intro" className={styles.card}>
@@ -44,7 +43,6 @@ export default function Home() {
               <li>Implémenter des services</li>
               <li>Migrations & formulaires</li>
             </ul>
-            <span className={styles.badge}>À venir</span>
           </Link>
         </div>
       </main>
