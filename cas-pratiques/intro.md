@@ -6,62 +6,32 @@ sidebar_position: 1
 
 Exercices de code pratiques pour tester les compétences Angular en conditions réelles.
 
-## 📚 Exercices disponibles
+## 📚 Exercices par niveau
 
-### [Calculatrice Simple](./calculatrice)
+Les exercices sont organisés par niveau de difficulté. Certains exercices peuvent apparaître dans plusieurs catégories selon les objectifs d'évaluation.
 
-Créer une calculatrice permettant d'effectuer les opérations de base.
+### 🟢 Junior (0-2 ans)
 
-**Niveau :** Junior / Débutant
+**Focus :** Composants de base, templates, data binding, directives structurelles
 
-**Features :**
-- Opérations de base (+, -, ×, ÷)
-- Gestion des nombres décimaux
-- Gestion des erreurs
+- **Calculatrice Simple** - Opérations de base, événements, affichage dynamique
+- **Todo List** - Liste, filtres, CRUD simple, directives (*ngFor, *ngIf)
+- **Convertisseur d'Unités** - Formulaire simple, logique de conversion, sélecteurs
+- **Recherche avec Autocomplete** - Introduction à RxJS (debounceTime, map), valueChanges
 
-### [Todo List](./todo-list)
+### 🟡 Confirmé (2-5 ans)
 
-Créer une application de gestion de tâches.
+**Focus :** Reactive Forms, RxJS, Services, state management
 
-**Niveau :** Junior / Débutant
+- **Formulaire d'Inscription** - Reactive Forms, validators personnalisés, validation cross-field
+- **Leaderboard du Zoo** - Services, routing, state management, logique métier complexe
+- **Formulaire Multi-étapes** - Stepper/wizard, validation progressive, navigation entre étapes
+- **Configurateur de Produit** - Calculs réactifs, RxJS (combineLatest), prix dynamique
+- **Éditeur avec Guard** - CanDeactivate guard, détection de modifications, confirmation de sortie
 
-**Features :**
-- Ajouter/supprimer des tâches
-- Marquer comme complétée
-- Filtrer (Toutes/Actives/Complétées)
-- Compteur de tâches restantes
+### 🔴 Senior (5+ ans)
 
-### [Convertisseur d'Unités](./convertisseur)
+**Focus :** Architecture, performance, patterns avancés
 
-Créer un convertisseur multi-unités (température, distance, poids, devises).
-
-**Niveau :** Junior / Débutant
-
-**Features :**
-- 4 types de conversions disponibles
-- Conversion en temps réel
-- Inverser les unités
-- Toutes les formules fournies
-
-### [Formulaire d'Inscription](./formulaire-inscription)
-
-Créer un formulaire d'inscription avec validation complète des données.
-
-**Niveau :** Junior / Intermédiaire
-
-**Features :**
-- Reactive Forms avec validations
-- Validators personnalisés (mot de passe, âge, confirmation)
-- Messages d'erreur en temps réel
-- Validation cross-field
-
-### [Leaderboard du Zoo](./zoo-leaderboard)
-
-Créer un système de vote pour déterminer le meilleur animal du zoo !
-
-**Niveau :** Intermédiaire
-
-**Features :**
-- Page VS pour faire s'affronter 2 animaux aléatoires
-- Page Leaderboard avec classement par score
+- *Aucun exercice pour le moment - à venir*
 
