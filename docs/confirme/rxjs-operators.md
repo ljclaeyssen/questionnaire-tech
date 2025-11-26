@@ -35,28 +35,7 @@ searchInput$.pipe(
 | `concatMap` | Exécute en séquence | Actions ordonnées |
 | `exhaustMap` | Ignore les nouvelles | Prévenir double-clic |
 
-```typescript
-// switchMap - Recherche
-searchInput$.pipe(
-  debounceTime(300),
-  switchMap(term => this.api.search(term))
-)
-
-// mergeMap - Requêtes parallèles
-users$.pipe(
-  mergeMap(user => this.api.getPosts(user.id))
-)
-
-// concatMap - Actions séquentielles
-orders$.pipe(
-  concatMap(order => this.api.createOrder(order))
-)
-
-// exhaustMap - Empêcher double-clic
-saveButton$.pipe(
-  exhaustMap(() => this.api.save(data))
-)
-```
+<iframe src="https://ljclaeyssen.github.io/rxjs-visu/#/main-operators" width="800" height="600" style={{border: 'none'}}></iframe>
 
 ## Opérateurs de transformation
 

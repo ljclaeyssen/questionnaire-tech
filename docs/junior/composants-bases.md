@@ -57,20 +57,20 @@ mon-composant/
 ## ❓ template vs templateUrl ?
 
 ```typescript
-// Template inline (petit composant)
+// Template inline
 @Component({
   template: '<h1>{{title}}</h1>'
 })
 
-// Template externe (composant complexe)
+// Template externe 
 @Component({
   templateUrl: './my.component.html'
 })
 ```
 
 **Quand utiliser quoi ?**
-- `template` : < 5 lignes
-- `templateUrl` : > 5 lignes
+- `template` : Idéalement jamais
+- `templateUrl` : Idéalement toujours
 
 ## ❓ Standalone vs NgModule ?
 
