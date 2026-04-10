@@ -92,7 +92,7 @@ double = computed(() => this.count() * 2);
 | Ancien | Nouveau |
 |--------|---------|
 | `RouterModule.forRoot()` | `provideRouter()` |
-| `loadChildren` (module) | `loadComponent` |
+| `loadChildren` (module) | `loadChildren` (routes) + `loadComponent` |
 
 ```typescript
 // ❌ Legacy
@@ -102,7 +102,8 @@ RouterModule.forRoot([
 
 // ✅ Moderne
 provideRouter([
-  { path: 'users', loadComponent: () => import('./users.component').then(m => m.UsersComponent) }
+  { path: 'users', loadComponent: () => import('./users.component').then(m => m.UsersComponent) },
+  { path: 'admin', loadChildren: () => import('./admin/admin.routes').then(m => m.ADMIN_ROUTES) }
 ])
 ```
 
@@ -140,12 +141,3 @@ bootstrapApplication(AppComponent, {
 });
 ```
 
-## Questions fréquentes pour examinateurs
-
-1. **Différence principale ?** → Standalone supprime les NgModules
-2. **@if plus rapide que *ngIf ?** → Oui, ~50% plus rapide
-3. **Peut-on mélanger ancien/nouveau ?** → Oui pendant migration
-4. **Quand migrer ?** → Nouveaux projets : tout de suite. Legacy : progressivement
-5. **NgModules obsolètes ?** → Oui depuis Angular 19+
-6. **Signals obligatoires ?** → Non mais recommandés
-7. **Zone.js nécessaire ?** → Plus avec zoneless (Angular 18+)

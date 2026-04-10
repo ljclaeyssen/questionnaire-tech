@@ -4,31 +4,32 @@ sidebar_position: 1
 
 # Questionnaire Tech Angular
 
-Cheat sheet et questions d'entretien pour Angular 16-21.
+Questions d'entretien technique Angular, format flashcard. Chaque question = une reponse directe + un snippet + un piege d'entretien.
 
-## 📚 Questions par niveau
-
-### 🟢 Junior (0-2 ans)
+## Junior (0-2 ans)
 - Angular CLI
 - Composants de base
-- Input/Output
-- Ancien vs Nouveau
+- Input / Output
+- Ancien vs Nouveau (cheat sheet)
+- Lifecycle Hooks
+- Pipes
 
-### 🟡 Confirmé (2-5 ans)
-- RxJS et opérateurs
+## Confirme (2-5 ans)
 - Signals
+- RxJS Operateurs
 - Control Flow (@if, @for)
+- Dependency Injection
+- Routing
+- HttpClient
+- Reactive Forms
+- Change Detection
 
-### 🔴 Senior (5+ ans)
-- Nouveautés Angular 16-21
-
-## 💻 Pratique
-
-### 🔍 Code Review
-Exercices de revue de code pour détecter bugs et mauvaises pratiques.
-
-### ⚡ Cas Pratiques
-Exercices de code à réaliser pendant l'entretien.
+## Senior (5+ ans)
+- Nouveautes Angular 16-21
+- Architecture & Patterns
+- Performance
+- Testing
+- Directives avancees
 
 ---
 

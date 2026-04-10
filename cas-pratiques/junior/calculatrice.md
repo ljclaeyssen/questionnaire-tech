@@ -2,47 +2,39 @@
 sidebar_position: 1
 ---
 
-# Cas Pratique : Calculatrice Simple
+# Calculatrice Simple
 
-## 🎯 Énoncé
+**Niveau** : Junior
+**Durée** : 30 min
+**Concepts évalués** : event binding, data binding, gestion d'état local
 
-Créer une calculatrice simple permettant d'effectuer les opérations de base.
+## Énoncé
 
-**Niveau : Junior / Débutant**
+Construire une calculatrice permettant d'effectuer les 4 opérations de base (+, -, ×, ÷).
+L'affichage se met à jour au fil de la saisie. Gérer les nombres décimaux et la division par zéro.
+Un bouton Clear remet la calculatrice à zéro.
 
-### Fonctionnalités
+## Critères d'évaluation
 
-La calculatrice doit permettre de :
-- Effectuer les 4 opérations de base : addition (+), soustraction (-), multiplication (×), division (÷)
-- Afficher le résultat en temps réel
-- Gérer les nombres décimaux
-- Inclure un bouton pour effacer (Clear)
-- Gérer les erreurs (division par zéro, etc.)
+- Structure de l'état : comment le candidat modélise `display`, `operator`, `previousValue`
+- Séparation entre la logique de calcul et le template
+- Gestion des cas limites : division par zéro, double opérateur, résultat décimal
+- Clarté du binding : utilise-t-il `(click)`, `[textContent]` à bon escient ?
 
-### Interface utilisateur
+<details>
+<summary>Indice 1</summary>
 
-L'interface doit contenir :
-- Un affichage pour les nombres et le résultat
-- Des boutons pour les chiffres de 0 à 9
-- Des boutons pour les opérations (+, -, ×, ÷)
-- Un bouton égal (=) pour calculer le résultat
-- Un bouton Clear (C) pour réinitialiser
-- Un bouton pour le point décimal (.)
+Pense à l'état minimal nécessaire : la valeur courante affichée, l'opérateur en attente, et la valeur précédente. Trois propriétés suffisent.
+</details>
 
-### Exemple de design
+<details>
+<summary>Indice 2</summary>
 
-```
-┌─────────────────────────┐
-│      [Affichage]        │
-├─────────────────────────┤
-│  7  │  8  │  9  │  ÷   │
-├─────────────────────────┤
-│  4  │  5  │  6  │  ×   │
-├─────────────────────────┤
-│  1  │  2  │  3  │  -   │
-├─────────────────────────┤
-│  0  │  .  │  =  │  +   │
-├─────────────────────────┤
-│        Clear (C)        │
-└─────────────────────────┘
-```
+Chaque bouton chiffre appelle une méthode `appendDigit(digit: string)` qui concatène au display courant. Les boutons opérateurs appellent `setOperator(op: string)` qui mémorise le premier opérande.
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Pour le calcul final, une simple structure `switch` sur l'opérateur suffit. Pense à convertir `parseFloat` avant de calculer, et à afficher `"Erreur"` si division par zéro.
+</details>

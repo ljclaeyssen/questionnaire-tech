@@ -2,54 +2,38 @@
 sidebar_position: 2
 ---
 
-# Cas Pratique : Todo List
+# Todo List
 
-## 🎯 Énoncé
+**Niveau** : Junior
+**Durée** : 30 min
+**Concepts évalués** : @for, @if, gestion de liste, event handling
 
-Créer une application de gestion de tâches permettant d'ajouter, supprimer et marquer des tâches comme complétées.
+## Énoncé
 
-**Niveau : Junior / Débutant**
+Construire une application de gestion de tâches. L'utilisateur peut ajouter des tâches, les marquer comme complétées, les supprimer et filtrer l'affichage (Toutes / Actives / Complétées). Un compteur indique le nombre de tâches actives restantes.
 
-### Fonctionnalités
+## Critères d'évaluation
 
-L'application doit permettre de :
-- Ajouter une nouvelle tâche avec un champ de saisie
-- Afficher la liste de toutes les tâches
-- Marquer une tâche comme complétée / non complétée (toggle)
-- Supprimer une tâche
-- Afficher le nombre de tâches actives restantes
-- Filtrer l'affichage : Toutes / Actives / Complétées
+- Utilisation correcte de `@for` et `@if` (syntaxe Angular 17+)
+- Modélisation de la tâche : interface `Todo` avec `id`, `text`, `completed`
+- Gestion du filtre sans mutation du tableau source
+- Binding bidirectionnel ou event-driven pour le toggle
+- Cohérence du compteur avec l'état réel
 
-### Interface utilisateur
+<details>
+<summary>Indice 1</summary>
 
-L'interface doit contenir :
-- Un champ de saisie pour ajouter une nouvelle tâche
-- Une liste affichant toutes les tâches avec :
-  - Une checkbox pour marquer comme complétée
-  - Le texte de la tâche (barré si complétée)
-  - Un bouton de suppression
-- Des boutons de filtre : "Toutes", "Actives", "Complétées"
-- Un compteur : "X tâche(s) restante(s)"
+Commence par définir une interface `Todo { id: number; text: string; completed: boolean }` et un tableau `todos: Todo[]`. Le filtre est juste un getter calculé à partir de ce tableau.
+</details>
 
-### Comportement attendu
+<details>
+<summary>Indice 2</summary>
 
-- Quand on ajoute une tâche, le champ de saisie se vide automatiquement
-- Les tâches complétées doivent être visuellement différenciées (texte barré, opacité réduite, etc.)
-- Les filtres ne suppriment pas les tâches, ils changent juste l'affichage
-- Le compteur affiche uniquement les tâches actives (non complétées)
-- Si on appuie sur "Entrée" dans le champ de saisie, la tâche est ajoutée
+Pour les filtres, utilise une propriété `filter: 'all' | 'active' | 'completed'` et un getter `filteredTodos` qui retourne le sous-ensemble correspondant. Pas besoin de tableaux séparés.
+</details>
 
-### Exemple de structure
+<details>
+<summary>Indice 3</summary>
 
-```
-┌─────────────────────────────────────┐
-│  Ajouter une tâche: [___________] ➕│
-├─────────────────────────────────────┤
-│  ☐ Faire les courses         [🗑️]  │
-│  ☑ Appeler le dentiste       [🗑️]  │
-│  ☐ Terminer le projet Angular [🗑️]  │
-├─────────────────────────────────────┤
-│  [Toutes] [Actives] [Complétées]   │
-│  2 tâche(s) restante(s)             │
-└─────────────────────────────────────┘
-```
+Le toggle se fait avec `todo.completed = !todo.completed`. Pour la suppression, `this.todos = this.todos.filter(t => t.id !== id)`. Le compteur : `get activeCount() { return this.todos.filter(t => !t.completed).length; }`.
+</details>

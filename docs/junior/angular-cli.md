@@ -2,78 +2,72 @@
 sidebar_position: 2
 ---
 
-# Angular CLI - L'outil indispensable
+# Angular CLI
 
-## Qu'est-ce que l'Angular CLI ?
+## Comment créer un nouveau projet Angular ?
 
-L'**Angular CLI** (Command Line Interface) est l'outil officiel pour créer, développer et builder des applications Angular. C'est votre meilleur ami pour gagner du temps !
-
-## Commandes de base
-
-### 1. ng new - Créer un nouveau projet
+> `ng new mon-projet` génère la structure complète avec config TypeScript, tests et optionnellement le routing.
 
 ```bash
-ng new mon-projet
+ng new mon-projet --routing --style=scss
 ```
 
-**Options importantes :**
-- `--routing` : Ajoute le routing Angular
-- `--style=scss|css|less|sass` : Choisir le préprocesseur CSS
-- `--skip-git` : Ne pas initialiser Git
-- `--skip-install` : Ne pas installer les dépendances automatiquement
+**Piège entretien :** Mentionner `--routing` et `--style` montre qu'on sait paramétrer dès le départ. Sans `--routing`, il faut l'ajouter manuellement ensuite.
 
-### 2. ng serve - Lancer le serveur de développement
+---
+
+## Quelle commande pour lancer le projet en développement ?
+
+> `ng serve` démarre un serveur local avec hot-reload sur `http://localhost:4200`.
 
 ```bash
-# Lancer le serveur (par défaut sur http://localhost:4200)
-ng serve
-
-# Avec options
-ng serve --open              # Ouvre automatiquement le navigateur
-ng serve --port 4300         # Changer le port
+ng serve --open       # ouvre le navigateur automatiquement
+ng serve --port 4300  # change le port
 ```
 
-**Options importantes :**
-- `--open` : Ouvre automatiquement le navigateur
-- `--port` : Changer le port
+**Piège entretien :** Ne pas confondre `ng serve` (dev, pas de build sur disque) et `ng build` (génère les fichiers dans `/dist`).
 
-### 3. ng build - Builder pour la production
+---
+
+## Différence entre `ng serve` et `ng build` ?
+
+> `ng serve` : serveur de dev en mémoire, rebuild à chaud, pas de fichiers générés. `ng build` : compile et écrit les fichiers dans `dist/` pour le déploiement.
 
 ```bash
-ng build
+ng build                            # production par défaut (depuis Angular 12)
+ng build --configuration=development  # build dev (sans optimisations)
 ```
 
-**Options importantes :**
-- `--configuration` : Build de développement
+**Piège entretien :** `ng build` est en mode production par défaut — tree-shaking, minification et AOT sont activés. `ng serve` n'est jamais utilisé pour servir une appli en production.
 
-### 4. ng test - Lancer les tests
+---
+
+## Quelles sont les commandes `ng generate` les plus utilisées ?
+
+> `ng generate` (alias `ng g`) crée automatiquement les fichiers avec le bon boilerplate et les bonnes conventions de nommage.
+
+| Commande | Raccourci | Génère |
+|----------|-----------|--------|
+| `ng g component user-card` | `ng g c` | Composant |
+| `ng g service user` | `ng g s` | Service |
+| `ng g directive highlight` | `ng g d` | Directive |
+| `ng g pipe truncate` | `ng g p` | Pipe |
+| `ng g guard auth` | `ng g g` | Guard |
+| `ng g interceptor auth` | - | Interceptor |
+| `ng g interface user` | `ng g i` | Interface |
+
+**Piège entretien :** Connaître les raccourcis (`ng g c`, `ng g s`) est un signal de pratique quotidienne. Mentionner `--skip-tests` et `--flat` pour les options les plus utiles.
+
+---
+
+## Options utiles de `ng generate component` ?
+
+> Permettent de personnaliser les fichiers générés sans modifier la config globale.
 
 ```bash
-ng test
+ng g c user-card --skip-tests    # pas de .spec.ts
+ng g c user-card --inline-template -s  # template et style dans le .ts
+ng g c user-card --flat          # pas de sous-dossier
 ```
 
-## ng generate - Générer du code
-
-La commande `ng generate` (ou `ng g`) est la plus utilisée au quotidien. Elle génère automatiquement des composants, services, pipes, etc.
-
-
-| Commande | Raccourci | Génère | Exemple |
-|----------|-----------|--------|---------|
-| `ng g component` | `ng g c` | Composant | `ng g c user-card` |
-| `ng g service` | `ng g s` | Service | `ng g s user` |
-| `ng g directive` | `ng g d` | Directive | `ng g d highlight` |
-| `ng g pipe` | `ng g p` | Pipe | `ng g p truncate` |
-| `ng g guard` | `ng g g` | Guard | `ng g g auth` |
-| `ng g interceptor` | - | Interceptor | `ng g interceptor auth` |
-| `ng g interface` | `ng g i` | Interface | `ng g i user` |
-| `ng g enum` | `ng g e` | Enum | `ng g e role` |
-| `ng g class` | `ng g cl` | Classe | `ng g cl utils/helper` |
-
-**Options utiles :**
-- `--skip-tests` : Ne pas générer le fichier de test
-- `--inline-template` ou `-t` : Template inline
-- `--inline-style` ou `-s` : Style inline
-- `--style=scss|css|less` : Type de fichier de style
-- `--flat` : Ne pas créer de dossier
-- `--export` : Exporter le composant (si dans un module)
-
+**Piège entretien :** `--flat` est utile pour les petits composants utilitaires. `--inline-template` est rarement utilisé en production mais peut être attendu en réponse sur les options.

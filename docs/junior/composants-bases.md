@@ -4,105 +4,93 @@ sidebar_position: 3
 
 # Les Composants
 
-## ❓ Qu'est-ce qu'un composant Angular ?
+## Qu'est-ce qu'un composant Angular ?
 
-Une classe TypeScript décorée avec `@Component` qui contrôle une partie de l'interface utilisateur.
+> Une classe TypeScript décorée avec `@Component` qui encapsule une partie de l'UI : template HTML, styles CSS et logique associée.
 
-**Structure :**
 ```typescript
-import { Component } from '@angular/core';
-
 @Component({
-  selector: 'app-example',
-  standalone: true,          // Angular 17+, par défaut depuis Angular 19
-  imports: [],
-  template: '<p>Hello</p>',
-  styles: ['p { color: blue; }']
+  selector: 'app-user-card',
+  standalone: true, // implicite depuis Angular 19
+  template: '<p>{{ name }}</p>',
 })
-export class ExampleComponent {
-  title = 'Mon Composant';
+export class UserCard {
+  name = 'Alice';
 }
 ```
 
-**Éléments clés :**
-- `selector` : Tag HTML
-- `standalone: true` : Pas besoin de NgModule
-- `imports` : Dépendances nécessaires
-- `template` ou `templateUrl` : Vue HTML
-- `styles` ou `styleUrls` : CSS
+**Piège entretien :** Un composant Angular = les 3 couches réunies (vue, style, logique). Le `selector` est le tag HTML qui permet de l'utiliser : `<app-user-card />`.
 
-## ❓ Comment créer un composant ?
+---
+
+## Comment créer un composant ?
+
+> Via Angular CLI, qui génère les 4 fichiers avec le bon boilerplate.
 
 ```bash
-# Angular CLI (recommandé)
-ng generate component mon-composant
-ng g c mon-composant  # Version courte
+ng generate component user-card
+# ou
+ng g c user-card
 ```
 
-**Fichiers générés :**
-```
-mon-composant/
-├── mon-composant.component.ts
-├── mon-composant.component.html
-├── mon-composant.component.scss
-└── mon-composant.component.spec.ts
-```
+Fichiers générés : `.ts`, `.html`, `.scss`, `.spec.ts`.
 
-**Options utiles :**
-- `--skip-tests` : Pas de fichier de test
-- `--inline-template` : Template dans le .ts
-- `--inline-style` : Styles dans le .ts
-- `--flat` : Pas de dossier
+**Piège entretien :** Toujours utiliser la CLI plutôt que créer les fichiers manuellement. Elle gère aussi l'enregistrement dans le module si nécessaire.
 
-## ❓ template vs templateUrl ?
+---
+
+## Différence entre `template` et `templateUrl` ?
+
+> `template` : HTML inline dans le décorateur. `templateUrl` : fichier `.html` séparé.
 
 ```typescript
-// Template inline
-@Component({
-  template: '<h1>{{title}}</h1>'
-})
+// Inline — acceptable pour les très petits composants
+@Component({ template: '<h1>{{ title }}</h1>' })
 
-// Template externe 
-@Component({
-  templateUrl: './my.component.html'
-})
+// Fichier séparé — recommandé en pratique
+@Component({ templateUrl: './user-card.component.html' })
 ```
 
-**Quand utiliser quoi ?**
-- `template` : Idéalement jamais
-- `templateUrl` : Idéalement toujours
+**Piège entretien :** `templateUrl` est la norme en production (lisibilité, coloration syntaxique, refacto). `template` inline est surtout utile pour des composants de test ou des exemples de documentation.
 
-## ❓ Standalone vs NgModule ?
+---
 
-### ✅ Moderne (Angular 17+)
+## Standalone vs NgModule : quelle différence ?
+
+> Standalone : le composant déclare lui-même ses dépendances via `imports`. NgModule : un module central déclare et exporte les composants.
+
 ```typescript
+// Standalone (Angular 14+, défaut depuis Angular 19)
 @Component({
-  standalone: true,
-  imports: [CommonModule]
+  standalone: true, // implicite depuis Angular 19, on peut l'omettre
+  imports: [CommonModule, RouterLink],
 })
-export class MyComponent {}
+export class UserCard {}
 ```
 
-### ❌ Legacy (Angular < 17)
 ```typescript
-// my.component.ts
-export class MyComponent {}
-
-// my.module.ts
+// Legacy NgModule
 @NgModule({
-  declarations: [MyComponent],
-  imports: [CommonModule]
+  declarations: [UserCardComponent],
+  imports: [CommonModule],
 })
-export class MyModule {}
+export class UserModule {}
 ```
 
-**Note :** Standalone est la norme depuis Angular 19+.
+**Piège entretien :** Standalone est la norme depuis Angular 19. Sur un projet existant en NgModule, savoir cohabiter les deux est un vrai plus.
 
-## Questions fréquentes pour examinateurs
+---
 
-1. **Qu'est-ce qu'un composant ?** → Classe + @Component + template + styles
-2. **Comment créer un composant ?** → ng generate component
-3. **Différence template vs templateUrl ?** → Inline vs fichier séparé
-4. **C'est quoi standalone ?** → Composant sans NgModule
-5. **Selector obligatoire ?** → Oui, pour utiliser le composant
-6. **Peut-on avoir plusieurs composants dans un fichier ?** → Oui mais déconseillé
+## Quels sont les éléments clés du décorateur `@Component` ?
+
+> Les propriétés du décorateur définissent comment Angular monte et affiche le composant.
+
+| Propriété | Rôle |
+|-----------|------|
+| `selector` | Tag HTML du composant |
+| `standalone` | Pas besoin de NgModule (Angular 14+, défaut 19+) |
+| `imports` | Dépendances du template (standalone) |
+| `template` / `templateUrl` | Vue HTML |
+| `styles` / `styleUrl` | CSS scopé au composant |
+
+**Piège entretien :** `selector` est obligatoire. Les styles sont automatiquement scopés au composant (pas de fuite CSS). `styleUrl` (singulier) est la nouvelle syntaxe depuis Angular 17.

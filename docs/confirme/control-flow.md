@@ -4,33 +4,10 @@ sidebar_position: 4
 
 # Control Flow - @if, @for, @switch
 
-## ❓ Pourquoi la nouvelle syntaxe ?
-
-Angular 17 remplace les directives structurelles par une syntaxe native plus performante.
-
-**Gains :**
-- 🚀 50% plus rapide
-- 📦 Bundle size réduit
-- 📖 Plus lisible
-
-## @if - Conditions
-
-### Syntaxe de base
+## @if vs *ngIf ?
+> `@if` est une syntaxe native Angular 17+ intégrée au compilateur. Elle supporte `@else if` nativement, sans `ng-template`.
 
 ```html
-<!-- ✅ Moderne -->
-@if (user) {
-  <div>Bonjour {{user.name}}</div>
-}
-
-<!-- ❌ Ancien -->
-<div *ngIf="user">Bonjour {{user.name}}</div>
-```
-
-### else et else if
-
-```html
-<!-- ✅ Moderne -->
 @if (role === 'admin') {
   <div>Panel Admin</div>
 } @else if (role === 'user') {
@@ -40,223 +17,71 @@ Angular 17 remplace les directives structurelles par une syntaxe native plus per
 }
 ```
 
-**Note :** `else if` natif ! (impossible avec *ngIf)
+**Piège entretien :** `else if` était impossible directement avec `*ngIf` — il fallait chaîner des `ng-template`. C'est un vrai argument de lisibilité à mentionner.
 
-**💡 Bonus - Ancien style avec ng-template :**
-```html
-<!-- ❌ Ancien - Verbeux et pas de else if natif -->
-<div *ngIf="user; else noUser">
-  Bonjour {{user.name}}
-</div>
-<ng-template #noUser>
-  <div>Veuillez vous connecter</div>
-</ng-template>
+---
 
-<!-- ❌ Ancien - else if avec ng-template imbriqués -->
-<div *ngIf="role === 'admin'; else checkUser">
-  <div>Panel Admin</div>
-</div>
-<ng-template #checkUser>
-  <div *ngIf="role === 'user'; else guest">
-    <div>Panel User</div>
-  </div>
-</ng-template>
-<ng-template #guest>
-  <div>Guest</div>
-</ng-template>
-```
-
-## @for - Boucles
-
-### Syntaxe de base
+## @for — comment ça marche ?
+> `track` est obligatoire dans `@for`. Il identifie chaque élément de manière unique pour que Angular réutilise le DOM existant plutôt que de tout recréer.
 
 ```html
 @for (user of users; track user.id) {
-  <div>{{user.name}}</div>
-}
-```
-
-**⚠️ Important :** `track` est OBLIGATOIRE !
-
-**À quoi sert track ?**
-- Identifie de manière unique chaque élément de la liste
-- Angular utilise cette valeur pour savoir quels éléments ont changé, été ajoutés ou supprimés
-- **Performance** : évite de recréer tout le DOM, réutilise les éléments existants
-- Utilise `track $index` si pas d'ID unique, ou `track item.id` pour un identifiant stable
-
-**Exemple :**
-```typescript
-// Sans track: Angular recrée TOUT le DOM
-// Avec track: Angular ne recrée que les éléments modifiés
-users = [
-  { id: 1, name: 'Alice' },
-  { id: 2, name: 'Bob' }
-];
-// Si on ajoute Bob → Angular réutilise Alice grâce à track user.id
-```
-
-### Variables de contexte
-
-```html
-@for (user of users; track user.id; let i = $index; let first = $first) {
-  <div [class.first]="first">
-    {{i + 1}}. {{user.name}}
-  </div>
-}
-```
-
-**Variables disponibles :**
-- `$index` : Index (0-based)
-- `$first` : Premier élément
-- `$last` : Dernier élément
-- `$even` : Index pair
-- `$odd` : Index impair
-- `$count` : Nombre total
-
-### @empty - Liste vide
-
-```html
-@for (user of users; track user.id) {
-  <div>{{user.name}}</div>
+  <div [class.highlighted]="$first">{{$index + 1}}. {{user.name}}</div>
 } @empty {
   <p>Aucun utilisateur</p>
 }
 ```
 
-Équivalent à :
-```html
-<!-- ❌ Ancien - Verbeux -->
-<div *ngIf="users.length > 0">
-  <div *ngFor="let user of users">{{user.name}}</div>
-</div>
-<div *ngIf="users.length === 0">
-  <p>Aucun utilisateur</p>
-</div>
-```
+**Variables contextuelles :** `$index`, `$first`, `$last`, `$even`, `$odd`, `$count`
 
-## @switch - Switch case
+**Piège entretien :** Oublier `track` est une erreur de compilation. Savoir justifier `track $index` (pas d'ID stable) vs `track user.id` (identifiant stable, meilleur pour les mutations).
+
+---
+
+## @switch vs ngSwitch ?
+> `@switch` remplace `[ngSwitch]` + `*ngSwitchCase`. La syntaxe est plus proche d'un vrai switch/case, sans directives à importer.
 
 ```html
 @switch (status) {
-  @case ('pending') {
-    <span>En attente</span>
-  }
-  @case ('approved') {
-    <span>Approuvé</span>
-  }
-  @case ('rejected') {
-    <span>Rejeté</span>
-  }
-  @default {
-    <span>Inconnu</span>
-  }
+  @case ('pending') { <span>En attente</span> }
+  @case ('approved') { <span>Approuvé</span> }
+  @default { <span>Inconnu</span> }
 }
 ```
 
-## Comparaison avant/après
+**Piège entretien :** `ngSwitch` nécessitait d'importer `NgSwitch`, `NgSwitchCase`, `NgSwitchDefault`. `@switch` n'a aucune dépendance à importer.
 
-| Ancien | Nouveau | Avantage |
-|--------|---------|----------|
-| `*ngIf` | `@if` | else if natif |
-| `*ngFor; trackBy: fn` | `@for; track id` | track inline |
-| `*ngSwitch` | `@switch` | Plus lisible |
-| ng-template pour else | `@else` | Simplifié |
-| Deux *ngIf pour empty | `@empty` | Intégré |
+---
 
-## ❓ track vs trackBy ?
+## Performances @for vs *ngFor ?
+> Le nouveau control flow est compilé statiquement, ce qui permet au compilateur d'optimiser le rendu. Gains mesurés sur 10 000 éléments :
 
-```typescript
-// ❌ Ancien - Fonction séparée
-trackByUserId(index: number, user: User) {
-  return user.id;
-}
+```
+*ngFor + *ngIf :         @for + @if :
+  Initial : 250ms          Initial : 120ms  (-52%)
+  Update  : 180ms          Update  :  90ms  (-50%)
 ```
 
-```html
-<div *ngFor="let user of users; trackBy: trackByUserId">
-```
+| Ancien | Nouveau | Avantage clé |
+|--------|---------|--------------|
+| `*ngIf` | `@if` | `else if` natif |
+| `*ngFor; trackBy: fn` | `@for; track id` | `track` inline obligatoire |
+| `[ngSwitch]` | `@switch` | Aucun import |
+| deux `*ngIf` pour empty | `@empty` | Intégré à `@for` |
 
-```html
-<!-- ✅ Nouveau - Expression inline -->
-@for (user of users; track user.id) {
-  <div>{{user.name}}</div>
-}
-```
+**Piège entretien :** Le gain de ~50% vient du fait que c'est du control flow natif compilé, pas des directives runtime. Citer les chiffres en entretien est un signal fort.
 
-**Avantages :**
-- Pas de fonction séparée
-- Peut utiliser l'index : `track $index`
-- Peut combiner : `track user.id + user.name`
+---
 
-## Migration automatique
+## Comment migrer automatiquement ?
+> Angular fournit un schematic officiel. Il migre les templates en une commande.
 
 ```bash
 # Migrer tout le projet
 ng generate @angular/core:control-flow
 
-# Migrer un fichier
+# Migrer un fichier spécifique
 ng g @angular/core:control-flow --path src/app/my.component.ts
 ```
 
-## Cas complexes
-
-### Conditions imbriquées
-
-```html
-@if (user) {
-  @if (user.isAdmin) {
-    <admin-panel />
-  } @else {
-    <user-panel />
-  }
-} @else {
-  <login-form />
-}
-```
-
-### Boucle avec conditions
-
-```html
-@for (product of products; track product.id) {
-  <div class="product">
-    <h3>{{product.name}}</h3>
-
-    @if (product.isNew) {
-      <span class="badge">Nouveau</span>
-    }
-
-    @if (product.onSale) {
-      <span class="price">{{product.price * 0.8}}€</span>
-    } @else {
-      <span class="price">{{product.price}}€</span>
-    }
-  </div>
-}
-```
-
-## Performance
-
-```
-Benchmark (10 000 éléments) :
-
-*ngFor + *ngIf :
-  Initial render: 250ms
-  Update: 180ms
-
-@for + @if :
-  Initial render: 120ms (-52%)
-  Update: 90ms (-50%)
-```
-
-## Questions fréquentes pour examinateurs
-
-1. **Pourquoi @if au lieu de *ngIf ?** → Performance, lisibilité, else if natif
-2. **track obligatoire ?** → Oui dans @for
-3. **Différence track vs trackBy ?** → track inline, trackBy fonction séparée
-4. **@empty sert à quoi ?** → Afficher contenu si liste vide
-5. **Variables dans @for ?** → $index, $first, $last, $even, $odd, $count
-6. **Migration auto ?** → `ng generate @angular/core:control-flow`
-7. **Peut mélanger ancien/nouveau ?** → Oui pendant migration
-8. **Gain de performance ?** → ~50% plus rapide
-9. **else if avec *ngIf ?** → Non, besoin de ng-template
-10. **Depuis quelle version ?** → Angular 17
+**Piège entretien :** Ancien et nouveau styles sont compatibles dans le même projet pendant la migration. Pas besoin de tout migrer d'un coup.

@@ -4,29 +4,24 @@ sidebar_position: 2
 
 # RxJS - Opérateurs Essentiels
 
-## ❓ Différence entre map et switchMap ?
+## map vs switchMap ?
+> `map` transforme une valeur (synchrone). `switchMap` transforme en Observable et annule l'Observable précédent à chaque nouvelle émission.
 
-### map - Transformation simple
 ```typescript
-numbers$.pipe(
-  map(x => x * 2)
-).subscribe(console.log);
-// 1 → 2, 2 → 4, 3 → 6
-```
+// map : transformation simple
+numbers$.pipe(map(x => x * 2))
 
-### switchMap - Aplatissement d'Observable
-```typescript
+// switchMap : annule la requête précédente
 searchInput$.pipe(
   switchMap(term => this.api.search(term))
-).subscribe(console.log);
-// Annule la requête précédente si nouvelle recherche
+)
 ```
 
-**Différence clé :**
-- `map` : transforme une valeur
-- `switchMap` : transforme en Observable et annule le précédent
+**Piège entretien :** Utiliser `switchMap` pour des requêtes parallèles indépendantes — c'est `mergeMap` qu'il faut.
 
-## ❓ Quand utiliser quel opérateur ?
+---
+
+## Quand utiliser quel opérateur d'aplatissement ?
 
 | Opérateur | Comportement | Cas d'usage |
 |-----------|--------------|-------------|
@@ -37,134 +32,61 @@ searchInput$.pipe(
 
 <iframe src="https://ljclaeyssen.github.io/rxjs-visu/#/main-operators" width="800" height="600" style={{border: 'none'}}></iframe>
 
-## Opérateurs de transformation
+**Piège entretien :** `exhaustMap` est souvent oublié. Le mentionner pour les formulaires de login ou boutons de soumission fait la différence.
+
+---
+
+## combineLatest vs withLatestFrom vs forkJoin ?
+> `combineLatest` émet à chaque changement (une fois chaque source a émis au moins une fois). `withLatestFrom` émet uniquement quand la source principale émet. `forkJoin` attend que tous soient complétés (comme `Promise.all`).
 
 ```typescript
-// map - Transformer
-of(1, 2, 3).pipe(map(x => x * 2))
-// → 2, 4, 6
-
-// map - Extraire propriété
-of({name: 'John'}).pipe(map(obj => obj.name))
-// → 'John'
-
-// scan - Accumuler
-of(1, 2, 3).pipe(scan((acc, val) => acc + val, 0))
-// → 1, 3, 6
-```
-
-## Opérateurs de filtrage
-
-```typescript
-// filter - Filtrer
-of(1, 2, 3, 4).pipe(filter(x => x > 2))
-// → 3, 4
-
-// take - Prendre n valeurs
-of(1, 2, 3).pipe(take(2))
-// → 1, 2
-
-// distinctUntilChanged - Ignorer doublons
-of(1, 1, 2, 2, 3).pipe(distinctUntilChanged())
-// → 1, 2, 3
-
-// debounceTime - Attendre délai
-input$.pipe(debounceTime(300))
-// Émet après 300ms d'inactivité
-```
-
-## Opérateurs de combinaison
-
-```typescript
-// combineLatest - Émet dès que chaque observable a émis au moins une fois,
-// puis à chaque changement de n'importe quel observable
-combineLatest([obs1$, obs2$]).pipe(
-  map(([val1, val2]) => val1 + val2)
+// combineLatest : formulaire multi-champs interdépendants
+combineLatest([filters$, pagination$]).pipe(
+  map(([filters, page]) => ({ filters, page }))
 )
-// Use case: formulaire avec plusieurs champs interdépendants
 
-// withLatestFrom - Émet quand la source émet, combine avec dernière valeur des autres
-click$.pipe(
-  withLatestFrom(user$, settings$),
-  map(([click, user, settings]) => ({ click, user, settings }))
-)
-// Use case: action utilisateur qui a besoin du contexte actuel
+// withLatestFrom : action utilisateur + contexte actuel
+click$.pipe(withLatestFrom(user$))
 
-// forkJoin - Attend que tous soient complétés, émet une seule fois (comme Promise.all)
-forkJoin([req1$, req2$, req3$])
-// Use case: charger plusieurs ressources en parallèle
-
-// merge - Émet immédiatement dès qu'un des observables émet
-merge(click$, keypress$)
-// Use case: réagir à plusieurs types d'événements
+// forkJoin : charger plusieurs ressources en parallèle
+forkJoin([getUser$, getSettings$, getPermissions$])
 ```
 
-## Gestion d'erreur
+**Piège entretien :** `combineLatest` ne complète jamais si une source ne complète pas. `forkJoin` ne renverra rien si une source n'émet pas avant de compléter.
+
+---
+
+## Comment éviter les memory leaks ?
+> Ne jamais laisser une subscription ouverte à la destruction du composant. Trois patterns, du pire au meilleur.
 
 ```typescript
-this.http.get('/api/users').pipe(
-  catchError(error => {
-    console.error(error);
-    return of([]); // Valeur par défaut
-  }),
-  retry(3) // Réessayer 3 fois
-)
-```
-
-## ❓ Comment éviter les memory leaks ?
-
-```typescript
-// ❌ Mauvais - Memory leak
+// Mauvais : leak
 ngOnInit() {
   this.data$.subscribe(data => this.data = data);
 }
 
-// ✅ Bon - DestroyRef (Angular 16+)
+// Bon : DestroyRef (Angular 16+)
 private destroyRef = inject(DestroyRef);
-
 ngOnInit() {
-  this.data$.pipe(
-    takeUntilDestroyed(this.destroyRef)
-  ).subscribe(data => this.data = data);
-}
-
-// ✅ Meilleur - Async pipe (pas de subscription manuelle)
-@Component({
-  template: `
-    @if (data$ | async; as data) {
-      <div>{{ data }}</div>
-    }
-  `
-})
-export class MyComponent {
-  data$ = this.http.get('/api/data');
-  // Unsubscribe automatique !
-}
-```
-
-**💡 Bonus - Ancien style (Angular < 16) :**
-```typescript
-private destroy$ = new Subject<void>();
-
-ngOnInit() {
-  this.data$.pipe(takeUntil(this.destroy$))
+  this.data$.pipe(takeUntilDestroyed(this.destroyRef))
     .subscribe(data => this.data = data);
 }
 
-ngOnDestroy() {
-  this.destroy$.next();
-  this.destroy$.complete();
-}
+// Meilleur : async pipe (unsubscribe automatique)
+// template: {{ data$ | async }}
 ```
 
-## RxJS vs Signals
+**Piège entretien :** L'`async pipe` est la réponse attendue. Connaître aussi `takeUntil(this.destroy$)` pour les codebases Angular < 16.
+
+---
+
+## RxJS vs Signals, quand utiliser quoi ?
 
 | Utiliser RxJS | Utiliser Signals |
 |---------------|------------------|
 | Async (HTTP, WebSocket) | État local synchrone |
-| Opérations complexes | Valeurs dérivées simples |
+| Opérations complexes (debounce, retry) | Valeurs dérivées simples |
 | Event streams | Inputs/Outputs |
-| debounce, retry, etc. | Performance optimale |
 
 ```typescript
 // Signal pour état local
@@ -172,24 +94,10 @@ count = signal(0);
 double = computed(() => this.count() * 2);
 
 // RxJS pour async
-users$ = this.http.get<User[]>('/api/users').pipe(
-  retry(3),
-  catchError(() => of([]))
-);
+users$ = this.http.get<User[]>('/api/users').pipe(retry(3));
 
-// Convertir Observable → Signal
+// Pont Observable → Signal
 users = toSignal(this.users$, { initialValue: [] });
 ```
 
-## Questions fréquentes pour examinateurs
-
-1. **map vs switchMap ?** → map transforme, switchMap aplatit et annule
-2. **Quand switchMap ?** → Recherche, autocomplétion (annule précédent)
-3. **Quand mergeMap ?** → Requêtes parallèles indépendantes
-4. **Quand concatMap ?** → Actions séquentielles (ordre important)
-5. **exhaustMap ?** → Ignorer nouvelles émissions (anti double-clic)
-6. **combineLatest vs withLatestFrom ?** → combineLatest émet si n'importe quel observable change, withLatestFrom émet uniquement quand la source émet
-7. **combineLatest vs forkJoin ?** → combineLatest émet à chaque changement après première émission de tous, forkJoin attend que tous soient complétés
-8. **catchError ?** → Gérer erreurs, retourner valeur par défaut
-9. **Comment éviter memory leaks ?** → DestroyRef + takeUntilDestroyed, ou async pipe (recommandé)
-10. **debounceTime ?** → Attendre inactivité (recherche)
+**Piège entretien :** Ce n'est pas l'un ou l'autre. `toSignal` et `toObservable` permettent de les combiner. La réponse attendue : RxJS pour l'async, Signals pour l'état local.

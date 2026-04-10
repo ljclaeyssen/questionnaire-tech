@@ -2,187 +2,37 @@
 sidebar_position: 3
 ---
 
-# Cas Pratique : Convertisseur d'Unités
+# Convertisseur d'Unités
 
-## 🎯 Énoncé
+**Niveau** : Junior
+**Durée** : 30 min
+**Concepts évalués** : two-way binding, formulaire simple, logique de calcul
 
-Créer un convertisseur permettant de convertir différentes unités de mesure (température, distance, poids, devises).
+## Énoncé
 
-**Niveau : Junior / Débutant**
+Construire un convertisseur d'unités couvrant la température (°C, °F, K), la distance (m, km, miles, pieds) et le poids (kg, g, lb, oz). L'utilisateur saisit une valeur, choisit l'unité source et l'unité cible — le résultat s'affiche en temps réel. Un bouton permet d'inverser les deux unités.
 
-### Fonctionnalités
+## Critères d'évaluation
 
-L'application doit permettre de :
-- Choisir le type de conversion (Température, Distance, Poids, Devises)
-- Saisir une valeur à convertir
-- Sélectionner l'unité de départ
-- Sélectionner l'unité d'arrivée
-- Afficher le résultat de la conversion en temps réel
-- Inverser les unités (swap)
+- Architecture du mapping de conversions : évite les `if/else` en cascade
+- Réactivité du résultat : recalcul à chaque changement de valeur ou d'unité
+- Gestion du cas `from === to` et des entrées vides ou invalides
+- Propreté du two-way binding (`ngModel` ou reactive forms)
 
-### Types de conversions
+<details>
+<summary>Indice 1</summary>
 
-#### 1. Température
-- Celsius (°C)
-- Fahrenheit (°F)
-- Kelvin (K)
+Centralise les formules dans un objet de type `Record<string, Record<string, (v: number) => number>>` plutôt que des `if` imbriqués. Ex : `conversions['°C']['°F'] = v => v * 9/5 + 32`.
+</details>
 
-#### 2. Distance
-- Mètres (m)
-- Kilomètres (km)
-- Miles (mi)
-- Pieds (ft)
+<details>
+<summary>Indice 2</summary>
 
-#### 3. Poids
-- Kilogrammes (kg)
-- Grammes (g)
-- Livres (lb)
-- Onces (oz)
+Quand le type de conversion change (ex: Température → Distance), les unités disponibles changent aussi. Maintiens une liste `availableUnits` dérivée du type sélectionné pour alimenter les deux selects.
+</details>
 
-#### 4. Devises
-- Euro (EUR)
-- Dollar américain (USD)
-- Livre sterling (GBP)
-- Yen japonais (JPY)
+<details>
+<summary>Indice 3</summary>
 
-### Interface utilisateur
-
-L'interface doit contenir :
-- Un sélecteur pour le type de conversion
-- Un champ numérique pour la valeur à convertir
-- Un sélecteur pour l'unité de départ
-- Un bouton pour inverser les unités (⇄)
-- Un sélecteur pour l'unité d'arrivée
-- Un affichage du résultat
-
-### Formules de conversion
-
-#### Température
-
-**Celsius ↔ Fahrenheit**
-```
-°F = (°C × 9/5) + 32
-°C = (°F - 32) × 5/9
-```
-
-**Celsius ↔ Kelvin**
-```
-K = °C + 273.15
-°C = K - 273.15
-```
-
-**Fahrenheit ↔ Kelvin**
-```
-K = (°F - 32) × 5/9 + 273.15
-°F = (K - 273.15) × 9/5 + 32
-```
-
-#### Distance
-
-**Mètres ↔ Kilomètres**
-```
-km = m / 1000
-m = km × 1000
-```
-
-**Mètres ↔ Miles**
-```
-mi = m / 1609.344
-m = mi × 1609.344
-```
-
-**Mètres ↔ Pieds**
-```
-ft = m × 3.28084
-m = ft / 3.28084
-```
-
-**Kilomètres ↔ Miles**
-```
-mi = km / 1.609344
-km = mi × 1.609344
-```
-
-#### Poids
-
-**Kilogrammes ↔ Grammes**
-```
-g = kg × 1000
-kg = g / 1000
-```
-
-**Kilogrammes ↔ Livres**
-```
-lb = kg × 2.20462
-kg = lb / 2.20462
-```
-
-**Kilogrammes ↔ Onces**
-```
-oz = kg × 35.274
-kg = oz / 35.274
-```
-
-**Livres ↔ Onces**
-```
-oz = lb × 16
-lb = oz / 16
-```
-
-#### Devises (Taux de change au 2024)
-
-**Conversions depuis EUR**
-```
-USD = EUR × 1.09
-GBP = EUR × 0.86
-JPY = EUR × 161.50
-```
-
-**Conversions depuis USD**
-```
-EUR = USD × 0.92
-GBP = USD × 0.79
-JPY = USD × 148.50
-```
-
-**Conversions depuis GBP**
-```
-EUR = GBP × 1.16
-USD = GBP × 1.27
-JPY = GBP × 188.00
-```
-
-**Conversions depuis JPY**
-```
-EUR = JPY × 0.0062
-USD = JPY × 0.0067
-GBP = JPY × 0.0053
-```
-
-### Comportement attendu
-
-- La conversion doit se faire en temps réel lors de la saisie
-- Si l'unité de départ et d'arrivée sont identiques, afficher la même valeur
-- Le bouton d'inversion (⇄) échange l'unité de départ et d'arrivée
-- Gérer les nombres décimaux
-- Arrondir le résultat à 2 décimales
-
-### Exemple de structure
-
-```
-┌─────────────────────────────────────────┐
-│  Type: [Température ▼]                  │
-├─────────────────────────────────────────┤
-│  Valeur: [_______]                      │
-│                                         │
-│  De:     [Celsius ▼]                    │
-│          [    ⇄     ]  (Inverser)       │
-│  Vers:   [Fahrenheit ▼]                 │
-│                                         │
-│  Résultat: XX.XX °F                     │
-└─────────────────────────────────────────┘
-```
-
-### Note sur les devises
-
-Les taux de change sont fixes dans cet exercice pour simplifier. En conditions réelles, vous utiliseriez une API pour obtenir les taux en temps réel.
+Pour le bouton "inverser", il suffit de swapper `fromUnit` et `toUnit` : `[this.fromUnit, this.toUnit] = [this.toUnit, this.fromUnit]`. La méthode `convert()` recalcule automatiquement si elle est appelée à chaque changement.
+</details>

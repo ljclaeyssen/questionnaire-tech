@@ -2,141 +2,57 @@
 sidebar_position: 5
 ---
 
-# Cas Pratique : Éditeur avec Guard de Sortie
+# Éditeur avec Guard de Sortie
 
-## 🎯 Énoncé
+**Niveau** : Confirmé
+**Durée** : 45 min
+**Concepts évalués** : CanDeactivate guard fonctionnel, dirty state, reactive forms, routing
 
-Créer un éditeur d'article de blog avec protection contre la perte de données lors de la navigation.
+## Énoncé
 
-**Niveau : Confirmé**
+Construire un éditeur d'article de blog avec deux pages : une liste d'articles et un éditeur. L'éditeur doit détecter les modifications non sauvegardées et bloquer la navigation avec une confirmation si l'utilisateur tente de quitter sans sauvegarder. La sauvegarde marque le formulaire comme propre et autorise la navigation.
 
-### Fonctionnalités
+## Critères d'évaluation
 
-L'application doit permettre de :
-- Créer et éditer un article de blog
-- Détecter si le formulaire a été modifié (dirty state)
-- Empêcher l'utilisateur de quitter la page si des modifications non sauvegardées existent
-- Afficher une boîte de dialogue de confirmation avant de quitter
-- Sauvegarder l'article et marquer le formulaire comme "propre"
-- Naviguer vers une liste d'articles
-- Gérer la navigation par le navigateur (bouton retour) et par l'application
+- Implémentation du guard fonctionnel `CanDeactivateFn` (Angular 15+)
+- Lecture correcte du `dirty` state sur le reactive form
+- Distinction entre `dirty` (modifié) et `saved` (explicitement sauvegardé)
+- Enregistrement du guard sur la route dans `app.routes.ts`
+- Comportement cohérent : confirmation uniquement si modifié ET non sauvegardé
 
-### Structure de l'application
+<details>
+<summary>Indice 1</summary>
 
-#### Page Liste (/articles)
-- Afficher une liste de 3-4 articles (titre + date)
-- Bouton "Nouvel article"
-- Cliquer sur un article pour l'éditer
+Le composant doit exposer une propriété publique lisible par le guard. Une propriété `isSaved = false` remise à `true` lors de la sauvegarde, combinée à `form.dirty`, donne la condition complète.
+</details>
 
-#### Page Éditeur (/articles/new ou /articles/:id)
-- Champ Titre (obligatoire, min 5 caractères)
-- Champ Auteur (obligatoire)
-- Champ Contenu (textarea, obligatoire, min 50 caractères)
-- Sélecteur Catégorie (Technologie, Voyage, Cuisine, Sport)
-- Checkbox "Publier immédiatement"
-- Boutons :
-  - "Sauvegarder" (désactivé si formulaire invalide)
-  - "Annuler" (retour à la liste avec confirmation si modifié)
-- Indicateur visuel si des modifications non sauvegardées existent
+<details>
+<summary>Indice 2</summary>
 
-### Le Guard (CanDeactivate)
-
-Le guard doit :
-- Vérifier si le formulaire a été modifié (dirty) **ET** non sauvegardé
-- Si oui, afficher une confirmation avant de quitter :
-  - "Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter ?"
-  - Options : "Quitter sans sauvegarder" / "Rester sur la page"
-- Si non, permettre la navigation sans confirmation
-- Fonctionner pour :
-  - Navigation interne (bouton Annuler, clic sur la liste)
-  - Navigation navigateur (bouton retour, fermeture onglet)
-  - Navigation par URL
-
-### Exemple de structure
-
-```
-┌─────────────────────────────────────────────┐
-│  Éditeur d'article          [⚠ Non sauvegardé] │
-├─────────────────────────────────────────────┤
-│  Titre:                                     │
-│  [Mon premier article____________]          │
-│                                             │
-│  Auteur:                                    │
-│  [Jean Dupont___________________]           │
-│                                             │
-│  Catégorie:                                 │
-│  [Technologie ▼]                           │
-│                                             │
-│  Contenu:                                   │
-│  [________________________________]          │
-│  [________________________________]          │
-│  [________________________________]          │
-│  [________________________________]          │
-│                                             │
-│  ☐ Publier immédiatement                    │
-│                                             │
-│  [Annuler]              [Sauvegarder]       │
-└─────────────────────────────────────────────┘
-```
-
-### Comportement attendu
-
-1. **Modifications détectées**
-   - Dès qu'un champ est modifié, marquer le formulaire comme "dirty"
-   - Afficher un indicateur visuel (ex: "Non sauvegardé" en orange)
-
-2. **Tentative de navigation avec modifications non sauvegardées**
-   - Bloquer la navigation
-   - Afficher la boîte de dialogue de confirmation
-   - Si "Quitter" → permettre la navigation
-   - Si "Rester" → annuler la navigation
-
-3. **Sauvegarde réussie**
-   - Marquer le formulaire comme "pristine"
-   - Retirer l'indicateur visuel
-   - Permettre la navigation sans confirmation
-   - Afficher un message de succès
-   - Rediriger vers la liste (optionnel)
-
-4. **Bouton Annuler**
-   - Si modifications → afficher la confirmation
-   - Si pas de modifications → retour direct à la liste
-
-### Structure technique recommandée
-
-#### Le Guard (CanDeactivate)
+Le guard fonctionnel s'écrit :
 
 ```typescript
-export interface CanComponentDeactivate {
-  canDeactivate: () => boolean | Observable<boolean>;
-}
-
-@Injectable({ providedIn: 'root' })
-export class UnsavedChangesGuard implements CanDeactivate<CanComponentDeactivate> {
-  canDeactivate(component: CanComponentDeactivate): boolean | Observable<boolean> {
-    return component.canDeactivate ? component.canDeactivate() : true;
+export const unsavedChangesGuard: CanDeactivateFn<EditorComponent> = (component) => {
+  if (component.articleForm.dirty && !component.isSaved) {
+    return confirm('Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter ?');
   }
-}
+  return true;
+};
 ```
+</details>
 
-#### Le Component
+<details>
+<summary>Indice 3</summary>
+
+Le guard se déclare dans le routing sur la route de l'éditeur :
 
 ```typescript
-export class EditorComponent implements CanComponentDeactivate {
-  articleForm: FormGroup;
-  isSaved = false;
-
-  canDeactivate(): boolean | Observable<boolean> {
-    if (this.articleForm.dirty && !this.isSaved) {
-      return confirm('Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter ?');
-    }
-    return true;
-  }
-
-  save() {
-    // Sauvegarder l'article
-    this.isSaved = true;
-    // ...
-  }
+{
+  path: 'articles/:id',
+  component: EditorComponent,
+  canDeactivate: [unsavedChangesGuard]
 }
 ```
+
+Attention : après une sauvegarde, pense à appeler `this.form.markAsPristine()` en plus de `this.isSaved = true` pour que le guard laisse passer sans confirmation.
+</details>

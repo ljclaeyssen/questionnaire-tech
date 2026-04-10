@@ -2,214 +2,192 @@
 sidebar_position: 4
 ---
 
-# Nouveautés Angular 16-21
+# Nouveautés Angular
 
 ## Angular 16 (Mai 2023)
 
-### 🎯 Signals
+### Signals
 ```typescript
 count = signal(0);
 double = computed(() => this.count() * 2);
-
 count.set(5);
-count.update(n => n + 1);
 ```
-
 **Impact :** Nouvelle primitive de réactivité, foundation pour zoneless.
 
-### 📝 Required Inputs
+### Required Inputs
 ```typescript
-// Avant
-@Input() name?: string;
-
-// Maintenant
-name = input.required<string>();
+@Input({ required: true }) name!: string;
 ```
+**Impact :** Erreur compile-time si input manquant (fini le `?` partout). Note : `input.required<string>()` signal-based arrive en Angular 17.
 
-### 🌊 Hydration SSR
+### Hydration SSR
 ```typescript
 bootstrapApplication(AppComponent, {
   providers: [provideClientHydration()]
 });
 ```
-
-**Gains :** Pas de flickering, meilleur SEO.
-
-### 🔧 Autres
-- Standalone par défaut dans CLI
-- DestroyRef pour cleanup
-- takeUntilDestroyed()
+**Impact :** Pas de flickering au rechargement, meilleur SEO.
 
 ## Angular 17 (Novembre 2023)
 
-### 🎨 Control Flow (@if, @for, @switch)
+### Control Flow (@if, @for, @switch)
 ```html
-@if (user) {
-  <div>{{user.name}}</div>
-}
-
-@for (item of items; track item.id) {
-  <div>{{item}}</div>
-}
+@if (user) { <div>{{user.name}}</div> }
+@for (item of items; track item.id) { <div>{{item}}</div> }
 ```
+**Impact :** 50% plus rapide, remplace `*ngIf`/`*ngFor`, bundle size réduit.
 
-**Gains :** 50% plus rapide, bundle size réduit.
-
-### 🎭 Deferrable Views
+### Deferrable Views
 ```html
 @defer (on viewport) {
   <app-heavy />
-} @placeholder {
-  Loading...
-} @error {
-  Error!
-}
+} @placeholder { Loading... }
 ```
+**Impact :** Lazy loading déclaratif avec triggers : idle, viewport, interaction, hover, timer.
 
-**Triggers :** idle, viewport, interaction, hover, timer.
-
-### ⚡ Vite + esbuild
-Build jusqu'à 87% plus rapide.
-
-### 🌐 Nouveau site angular.dev
-Remplace angular.io avec documentation interactive.
+### Vite + esbuild
+**Impact :** Build jusqu'à 87% plus rapide, hot reload quasi instantané.
 
 ## Angular 17.3 (Début 2024)
 
-### 📤 Output signals
+### Output / Model / viewChild signals
 ```typescript
-// Avant
-@Output() clicked = new EventEmitter<string>();
-
-// Maintenant
 clicked = output<string>();
-```
-
-### 🔗 Model inputs (two-way binding)
-```typescript
 value = model<string>('');
-
-// Usage
-<app-input [(value)]="myValue" />
-```
-
-### 👁️ viewChild/contentChild signals
-```typescript
-// Avant
-@ViewChild('input') input?: ElementRef;
-
-// Maintenant
 input = viewChild<ElementRef>('input');
 ```
+**Impact :** API unifiée signals pour I/O et accès DOM — supprime `@Output`, `@ViewChild`.
 
 ## Angular 18 (Mai 2024)
 
-### 🚫 Zoneless (Experimental)
+### Zoneless (Experimental)
 ```typescript
 bootstrapApplication(AppComponent, {
-  providers: [
-    provideExperimentalZonelessChangeDetection()
-  ]
+  providers: [provideExperimentalZonelessChangeDetection()]
 });
 ```
+**Impact :** -30KB bundle, +25% perf — change detection pilotée par Signals uniquement.
 
-**Gains :** -30KB bundle, +25% performance.
-
-### ✅ APIs stables
-- input() / output() stables
-- Deferrable views stables
-- SSR amélioré
-
-### 🎨 Material 3
-Angular Material passe à Material Design 3.
+### APIs stables
+`input()`, `output()`, deferrable views passent en stable. Material 3 disponible.
 
 ## Angular 19 (Novembre 2024)
 
-### 💧 Incremental Hydration
-```typescript
+### Incremental Hydration
+```html
 @defer (on viewport; hydrate on viewport) {
   <app-chart />
 }
 ```
+**Impact :** TTI réduit de 70%, hydratation progressive par bloc.
 
-**Gains :** TTI réduit de 70%.
-
-### 🎯 Standalone par défaut
+### Standalone par défaut
 ```bash
-ng new my-app
-# Génère 100% standalone (pas de NgModules)
+ng new my-app  # Génère 100% standalone — NgModules obsolètes
 ```
 
-### 🔗 LinkedSignals
+### Resource API + LinkedSignal
 ```typescript
-const value = signal(10);
-const doubled = linkedSignal(() => value() * 2);
-```
-
-### 📊 Resource API
-```typescript
-const userId = signal(1);
 const user = resource({
-  request: () => ({ id: userId() }),
-  loader: ({ request }) => this.http.get(`/api/users/${request.id}`)
+  params: () => ({ id: userId() }),
+  loader: async ({ params }) => {
+    const res = await fetch(`/api/users/${params.id}`);
+    return (await res.json()) as User;
+  }
 });
+const selectedIndex = linkedSignal(() => items().length > 0 ? 0 : -1);
 ```
+**Impact :** Data fetching réactif natif (loader async, pas Observable). `linkedSignal` : signal dérivé + modifiable manuellement.
 
 ## Angular 20 (Mai 2025)
 
-### 📊 Resource API stable
+### httpResource (Experimental)
 ```typescript
-// httpResource pour HTTP avec signals
-const user = httpResource({
-  url: () => `/api/users/${userId()}`,
-  loader: (url) => this.http.get<User>(url)
+const users = httpResource<User[]>({
+  url: '/api/users'
 });
 
-// user.value(), user.isLoading(), user.error()
+// users.value(), users.isLoading(), users.error()
 ```
 
-### ⚡ Signals API stable
-Signals, computed, input, output, viewChild officiellement stables.
+> **Attention :** `httpResource` est **experimental**. L'API peut encore évoluer.
 
-### 🛠️ ESBuild par défaut
+### ESBuild par défaut
+CLI utilise ESBuild pour des builds plus rapides et bundles plus petits.
+
+### ESBuild par défaut
 CLI utilise ESBuild pour des builds plus rapides et bundles plus petits.
 
 ## Angular 21 (Novembre 2025)
 
-### 🚫 Zoneless par défaut
+### Zoneless par défaut
 ```typescript
-// ng new mon-app
-// Zoneless activé automatiquement, plus besoin de provideExperimentalZonelessChangeDetection()
-```
-
-**Gains :** Plus de zone.js patchings, change detection prévisible avec Signals.
-
-### 📝 Signal Forms (Developer Preview)
-```typescript
-import { form, Control, required } from '@angular/forms/signals';
-
-const userForm = form({
-  name: Control('', [required()]),
-  email: Control('', [required()])
-});
-
-// Accès direct sans subscribe
-console.log(userForm.value().name);
-
-// Réactivité automatique
-effect(() => {
-  console.log('Form value:', userForm.value());
+// ng new mon-app → zoneless activé automatiquement
+// Plus besoin de provideExperimentalZonelessChangeDetection()
+bootstrapApplication(AppComponent, {
+  providers: [provideRouter(routes)]
+  // Zone.js n'est plus là
 });
 ```
+**Impact :** Plus de monkey-patching Zone.js, change detection pilotée uniquement par les Signals. -30KB de bundle.
 
-**Avantages :**
-- Pas de valueChanges observable
-- Pas de subscribe/unsubscribe
-- Compatible zoneless
-- Plus lisible et concis
+### Signal Forms (Experimental)
+```typescript
+import { signal } from '@angular/core';
+import { form, FormField, required, email, minLength } from '@angular/forms/signals';
 
-### ⚡ Amélioration @defer
-Optimisations pour le lazy loading de composants.
+interface LoginData { email: string; password: string; }
+const model = signal<LoginData>({ email: '', password: '' });
+
+const loginForm = form(model, (schema) => {
+  required(schema.email, { message: 'Email requis' });
+  email(schema.email);
+  required(schema.password);
+  minLength(schema.password, 8);
+});
+
+// Lecture : loginForm.email().value(), loginForm.email().valid(), loginForm.email().errors()
+// Template : <input [formField]="loginForm.email" />
+```
+**Impact :** Plus de `valueChanges` Observable, plus de `subscribe`. Tout est signal-based : `value()`, `valid()`, `touched()`, `dirty()`. La directive `[formField]` synchronise automatiquement `required`, `disabled`, `readonly`.
+
+> **Attention :** Signal Forms sont **experimental** — l'API peut changer.
+
+### Vitest par défaut
+```bash
+ng new mon-app   # Vitest configuré automatiquement
+ng test          # Exécute Vitest (plus Karma)
+```
+**Impact :** Vitest remplace Karma comme runner par défaut sur les nouveaux projets. Karma reste supporté pour les projets existants.
+
+## Angular 22 (à venir)
+
+> **Roadmap annoncée — ne pas présenter comme acquis en entretien.**
+
+### debounced() (Experimental)
+```typescript
+import { signal } from '@angular/core';
+import { debounced } from '@angular/core';
+
+const search = signal('');
+const debouncedSearch = debounced(() => search(), 300);
+// debouncedSearch.value() se met à jour 300ms après le dernier changement de search()
+```
+**Impact :** Plus besoin de `debounceTime` RxJS pour les cas simples. Retourne une `Resource<T>` — s'intègre nativement dans l'écosystème signals.
+
+### ChangeDetectionStrategy : OnPush par défaut
+```typescript
+// Default est renommé en Eager (et déprécié)
+// OnPush devient le défaut — plus besoin de le déclarer
+@Component({
+  // changeDetection: ChangeDetectionStrategy.OnPush ← c'est le défaut maintenant
+  template: `{{ data() }}`
+})
+export class MyComponent {
+  data = signal('hello');
+}
+```
+**Impact :** Fin de l'ère du dirty checking global. Les nouveaux composants sont OnPush par défaut. `ChangeDetectionStrategy.Default` est renommé `Eager` et déprécié.
 
 ## Comparaison des versions
 
@@ -219,8 +197,9 @@ Optimisations pour le lazy loading de composants.
 | 17 | Control Flow | +50% | -10% |
 | 18 | Zoneless exp. | +25% | -15% |
 | 19 | Incr. Hydration | +30% | -5% |
-| 20 | Resource API | +15% | -10% |
-| 21 | Zoneless défaut | +20% | -15% |
+| 20 | httpResource + Signals stables | +15% | -10% |
+| 21 | Zoneless défaut + Signal Forms | +20% | -30KB |
+| 22 | OnPush défaut + debounced() | TBD | TBD |
 
 ## Timeline de migration
 
@@ -229,51 +208,28 @@ Optimisations pour le lazy loading de composants.
 2023 Q4 : Angular 17 → Control Flow
 2024 Q2 : Angular 18 → Tester Zoneless
 2024 Q4 : Angular 19 → Standalone 100%
-2025 Q2 : Angular 20 → Resource API stable
-2025 Q4 : Angular 21 → Zoneless par défaut + Signal Forms
+2025 Q2 : Angular 20 → Signals stables, httpResource (experimental)
+2025 Q4 : Angular 21 → Zoneless défaut, Signal Forms (exp.), Vitest
+2026 Q2 : Angular 22 → OnPush défaut, debounced() (roadmap)
 ```
 
-## ❓ Que retenir pour entretien ?
+---
 
-### Angular 16
-- Signals (signal, computed, input)
-- Hydration SSR
-- Required inputs
+## Comment aborder une migration Angular en entretien ?
+> Présenter une stratégie progressive : ng update version par version, migration automatique (schematics), feature flags pour basculer progressivement. Ne jamais proposer un big bang.
 
-### Angular 17
-- @if, @for, @switch
-- Deferrable views
-- Vite/esbuild
+**Piège entretien :** Le recruteur veut entendre "progressif" et "sans casser la prod", pas une liste de features.
 
-### Angular 18
-- Zoneless (experimental)
-- APIs signals stables
-- Material 3
+---
 
-### Angular 19
-- Incremental hydration
-- Standalone obligatoire
-- Resource API
+## Signals vs Zone.js : quel impact sur l'architecture ?
+> Zone.js fait du dirty checking global (coûteux). Signals permettent une change detection granulaire — seuls les composants qui consomment un signal modifié sont re-rendus. C'est ce qui rend le zoneless possible.
 
-### Angular 20
-- Resource API stable (httpResource)
-- ESBuild par défaut
-- Signals API complètement stable
+**Piège entretien :** Savoir expliquer POURQUOI les Signals existent (performance), pas juste la syntaxe.
 
-### Angular 21
-- Zoneless par défaut
-- Signal Forms (developer preview)
-- Amélioration @defer
+---
 
-## Questions fréquentes pour examinateurs
+## Quelle version Angular minimum recommander pour un nouveau projet ?
+> Angular 19+ minimum. Standalone par défaut, Signals stables, control flow moderne, SSR mature. Angular 17 est acceptable si contraintes d'entreprise.
 
-1. **Nouveauté majeure Angular 16 ?** → Signals
-2. **Nouveauté majeure Angular 17 ?** → Control Flow (@if, @for)
-3. **Deferrable views ?** → Lazy loading de composants avec triggers
-4. **Zoneless c'est quoi ?** → Angular sans Zone.js (plus léger, rapide)
-5. **Quand zoneless par défaut ?** → Expérimental en 18, par défaut en 21
-6. **Signal Forms c'est quoi ?** → Forms avec signals au lieu d'observables (Angular 21, dev preview)
-7. **Incremental hydration ?** → Hydratation progressive (Angular 19)
-8. **Standalone obligatoire quand ?** → Angular 19+
-9. **Resource API ?** → Fetch data avec signals, introduite en 19, stable en 20
-10. **httpResource ?** → Resource API pour HTTP avec gestion auto loading/error (Angular 20)
+**Piège entretien :** Justifier son choix avec des arguments techniques, pas juste "la dernière".

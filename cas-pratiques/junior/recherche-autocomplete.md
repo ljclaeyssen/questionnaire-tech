@@ -2,27 +2,15 @@
 sidebar_position: 4
 ---
 
-# Cas Pratique : Recherche avec Autocomplete
+# Recherche avec Autocomplete
 
-## 🎯 Énoncé
+**Niveau** : Junior
+**Durée** : 30 min
+**Concepts évalués** : RxJS (debounceTime, map, filter), reactive forms, async pipe
 
-Créer une barre de recherche intelligente avec suggestions automatiques utilisant RxJS.
+## Énoncé
 
-**Niveau : Junior / Débutant**
-
-### Fonctionnalités
-
-L'application doit permettre de :
-- Saisir du texte dans un champ de recherche
-- Afficher automatiquement les résultats correspondants pendant la saisie
-- Attendre que l'utilisateur arrête de taper avant de filtrer (debounce)
-- Ignorer les recherches de moins de 2 caractères
-- Afficher "Aucun résultat" si la recherche ne retourne rien
-- Afficher le nombre de résultats trouvés
-
-### Liste de données
-
-Utiliser cette liste de pays pour la recherche :
+Construire une barre de recherche avec suggestions automatiques sur une liste de pays. La recherche se déclenche 300ms après la dernière frappe, uniquement si au moins 2 caractères sont saisis. Les résultats sont filtrés sans distinction de casse. Un compteur affiche le nombre de résultats trouvés.
 
 ```typescript
 countries = [
@@ -35,33 +23,27 @@ countries = [
 ];
 ```
 
-### Comportement attendu
+## Critères d'évaluation
 
-- Attendre **300ms** après la dernière frappe avant de filtrer
-- Ne rechercher que si **au moins 2 caractères** sont saisis
-- La recherche doit être **insensible à la casse**
-- Si le champ est vidé, afficher tous les pays
-- Afficher un message "Tapez au moins 2 caractères" si moins de 2 caractères
-- Mettre en évidence le texte recherché dans les résultats (bonus)
+- Chaîne RxJS correcte : `debounceTime`, `distinctUntilChanged`, `map`, `filter`
+- Utilisation de `async pipe` dans le template plutôt qu'un `subscribe` manuel
+- Gestion des états : moins de 2 caractères, aucun résultat, résultats trouvés
+- Nettoyage des observables (pas de fuite mémoire)
 
-### Interface utilisateur
+<details>
+<summary>Indice 1</summary>
 
-L'interface doit contenir :
-- Un champ de recherche (input)
-- Un compteur : "X résultat(s) trouvé(s)"
-- Une liste des résultats correspondants
-- Un message d'information selon l'état (pas assez de caractères, aucun résultat, etc.)
+Crée un `FormControl` pour le champ de recherche et écoute `valueChanges`. C'est le point d'entrée naturel de la chaîne RxJS — pas besoin d'event listener manuel.
+</details>
 
-### Exemple de structure
+<details>
+<summary>Indice 2</summary>
 
-```
-┌─────────────────────────────────────┐
-│  Recherche: [fra_______]  🔍        │
-├─────────────────────────────────────┤
-│  3 résultat(s) trouvé(s)            │
-├─────────────────────────────────────┤
-│  • France                           │
-│  • Afrique du Sud                   │
-│  • République tchèque               │
-└─────────────────────────────────────┘
-```
+La chaîne ressemble à : `this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged(), map(term => this.filterCountries(term)))`. Assigne le résultat à `results$: Observable<string[]>` et utilise `async` dans le template.
+</details>
+
+<details>
+<summary>Indice 3</summary>
+
+Pour conditionner l'affichage selon le nombre de caractères, ajoute un `map` qui retourne un tableau vide si `term.length < 2`. Tu peux combiner ça avec un second observable `message$` pour afficher "Tapez au moins 2 caractères" vs "Aucun résultat".
+</details>

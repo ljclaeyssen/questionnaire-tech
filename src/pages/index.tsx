@@ -17,31 +17,31 @@ export default function Home() {
         <div className={styles.sections}>
           <Link to="/questions/intro" className={styles.card}>
             <h2>📚 Questions</h2>
-            <p>Questions par niveau : Junior, Confirmé, Senior</p>
+            <p>19 sujets par niveau : Junior, Confirmé, Senior</p>
             <ul>
-              <li>Angular CLI & Composants</li>
-              <li>RxJS & Signals</li>
-              <li>Nouveautés Angular 16-21</li>
+              <li>CLI, Composants, Lifecycle, Pipes</li>
+              <li>Signals, RxJS, DI, Routing, Forms</li>
+              <li>Architecture, Performance, Testing</li>
             </ul>
           </Link>
 
           <Link to="/code-review/intro" className={styles.card}>
             <h2>🔍 Code Review</h2>
-            <p>Exercices de revue de code</p>
+            <p>4 exercices de revue de code Angular</p>
             <ul>
-              <li>Détection de bugs</li>
-              <li>Optimisation de performance</li>
-              <li>Sécurité & mauvaises pratiques</li>
+              <li>Components : memory leaks, change detection</li>
+              <li>Services : état mutable, couplage</li>
+              <li>Formulaires : validation, observables</li>
             </ul>
           </Link>
 
           <Link to="/cas-pratiques/intro" className={styles.card}>
             <h2>⚡ Cas Pratiques</h2>
-            <p>Exercices de code pratiques</p>
+            <p>11 exercices de live coding</p>
             <ul>
-              <li>Créer des composants</li>
-              <li>Implémenter des services</li>
-              <li>Migrations & formulaires</li>
+              <li>Junior : calculatrice, todo, recherche</li>
+              <li>Confirmé : forms, routing, guards</li>
+              <li>Senior : dashboard, refactoring legacy</li>
             </ul>
           </Link>
         </div>
