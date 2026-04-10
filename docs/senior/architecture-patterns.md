@@ -38,23 +38,53 @@ export class UserList {
 
 ## Comment structurer une app Angular à grande échelle ?
 
-> Feature-based : un dossier par feature, chaque feature expose ses routes. `shared/` pour les composants réutilisables. `core/` pour les services singleton (auth, logger, http interceptors). Chaque feature est un domaine isolé — pas de couplage horizontal entre features.
+> Deux approches classiques selon la taille du projet :
+
+### Feature-based (apps moyennes)
+
+Chaque feature est un dossier isolé avec ses routes, services et composants. `shared/` pour le réutilisable, `core/` pour les singletons.
 
 ```
-src/
-  app/
-    core/          # Services singleton, guards, interceptors
-    shared/        # Composants/pipes/directives réutilisables
-    features/
-      users/       # Tout ce qui concerne "users"
-        data/      # Services, modèles
-        ui/        # Composants
-        users.routes.ts
-      orders/
-        ...
+src/app/
+  core/            # Services singleton, guards, interceptors
+  shared/          # Composants/pipes/directives réutilisables
+  features/
+    users/         # Tout ce qui concerne "users"
+      data/        # Services, modèles
+      ui/          # Composants
+      users.routes.ts
+    orders/
+      ...
 ```
 
-**Piege entretien :** Éviter les barrel files (`index.ts`) trop profonds. Ils créent des imports circulaires et cassent le tree-shaking — Angular doit charger tout le barrel pour résoudre un seul export.
+### Clean Architecture / Hexagonale (apps critiques)
+
+Sépare strictement le domaine métier du framework. Les dépendances coulent de l'extérieur vers le coeur — jamais l'inverse. Le domaine est du TypeScript pur (zéro `@angular/*`).
+
+```
+src/app/
+  domain/          # Coeur métier (TS pur, zéro dépendance Angular)
+    models/        # Interfaces, types, value objects
+    gateways/      # Ports : classes abstraites (contrats)
+  gateways/        # Adaptateurs : implémentations concrètes (REST, in-memory)
+  use-cases/       # Orchestration métier (1 classe = 1 action, méthode execute())
+  store/           # État réactif (Signals), sélecteurs computed()
+  ui/              # Couche Angular (composants, routes, thème)
+    features/      # Un dossier par feature, lazy-loaded
+    shared/        # Composants réutilisables
+```
+
+| Couche | Peut importer | Ne peut PAS importer |
+|---|---|---|
+| `domain/` | TypeScript pur, types RxJS | Angular, gateways concrets, ui |
+| `gateways/` | `domain/`, Angular (HttpClient) | use-cases, store, ui |
+| `use-cases/` | `domain/`, `store/` | Angular, ui, gateways concrets |
+| `store/` | `domain/` | use-cases, ui, gateways |
+| `ui/` | Toutes les couches | — (rester léger) |
+
+Ces règles de dépendance s'appliquent automatiquement via `eslint-plugin-boundaries`.
+
+**Piege entretien :** La Clean Architecture est un plus en entretien senior, mais ne la proposer que si l'app le justifie (domaine complexe, beaucoup de logique métier, équipe large). Pour un CRUD simple, feature-based suffit. Imposer l'hexagonal sur un petit projet est de l'over-engineering — c'est un red flag aussi.
 
 ---
 
